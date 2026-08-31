@@ -245,7 +245,18 @@ fi
 [ -f "$REPO_DIR/templates/CLAUDE.md.tmpl" ] || [ -f "$REPO_DIR/CLAUDE.md" ] \
   || ens_die "the engagement repo has no template scaffold yet — re-run /init-engagement in a moment (idempotent)."
 
-# Render the root CLAUDE.md from the template (tether requires it at the root).
+# Render the root docs from their templates. AGENTS.md is the canonical
+# instruction file (AAIF format, read by every coding agent, not only Claude);
+# CLAUDE.md is a pointer to it and stays at the root because tether asserts on
+# it. Each is rendered only if absent, so a re-run never clobbers an engagement
+# that has since edited its own copy.
+#
+# AGENTS.md.tmpl is guarded rather than assumed: an engagement created from a
+# template revision that predates it still has to init cleanly, and in that case
+# the old CLAUDE.md.tmpl is the whole process doc rather than a pointer.
+if [ ! -f "$REPO_DIR/AGENTS.md" ] && [ -f "$REPO_DIR/templates/AGENTS.md.tmpl" ]; then
+  cp "$REPO_DIR/templates/AGENTS.md.tmpl" "$REPO_DIR/AGENTS.md"
+fi
 if [ ! -f "$REPO_DIR/CLAUDE.md" ] && [ -f "$REPO_DIR/templates/CLAUDE.md.tmpl" ]; then
   cp "$REPO_DIR/templates/CLAUDE.md.tmpl" "$REPO_DIR/CLAUDE.md"
 fi
@@ -254,7 +265,7 @@ fi
 # .claude/CLAUDE.md is the engagement working-agreement doc shipped by the
 # template's .claude/ scaffold; it carries {{project_name}}/{{scope_tag}}/
 # {{founder_handle}}/{{tailnet}} which must render at init like the root doc.
-for f in CLAUDE.md .claude/CLAUDE.md .ensemble/project.json .lfsconfig; do
+for f in AGENTS.md CLAUDE.md .claude/CLAUDE.md .ensemble/project.json .lfsconfig; do
   [ -f "$REPO_DIR/$f" ] || continue
   if grep -q '{{' "$REPO_DIR/$f" 2>/dev/null; then
     python3 "$STATE_PY" fill "$REPO_DIR/$f" "${fill_args[@]}" \
