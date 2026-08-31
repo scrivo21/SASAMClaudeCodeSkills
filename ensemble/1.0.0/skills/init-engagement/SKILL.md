@@ -13,7 +13,9 @@ It does, idempotently (re-runnable after any interruption — every step is crea
 
 1. **Creates the GitHub repo** `<owner>/sasam-<scope_tag>` from the
    `SAS-Asset-Management/sasam-engagement-template` template.
-2. **Fills the scaffold** — renders the root `CLAUDE.md` from `templates/CLAUDE.md.tmpl`,
+2. **Fills the scaffold** — renders the root `AGENTS.md` from `templates/AGENTS.md.tmpl`
+   (the canonical instruction file, in the AAIF AGENTS.md format that every coding agent
+   reads) and the root `CLAUDE.md` pointer from `templates/CLAUDE.md.tmpl`,
    fills `.ensemble/project.json` (uuid, name, scope_tag, repo, bucket, consultants, …) and
    `.lfsconfig` (tailnet + scope_tag), commits and pushes `main`.
 3. **Applies the two-branch model** — runs the repo's `scripts/apply-branch-protection.sh`:
